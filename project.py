@@ -3,14 +3,15 @@ import numpy as np
 import cv2
 from PIL import Image
 from math import radians, sin, cos
-import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 import tempfile
 import os
 
-# ========== THEME CONTROLLER ==========
-theme = st.sidebar.selectbox("🎨 Choose Theme", ["💗 Pink", "🌙 Dark Mode", "☀ Light Mode"])
+# ================== LANGUAGE & THEME ==================
+lang = st.sidebar.selectbox("🌐 Language / Bahasa", ["English", "Indonesia"])
+
+theme = st.sidebar.selectbox("🎨 Theme", ["💗 Pink", "🌙 Dark Mode", "☀ Light Mode"])
 
 
 def apply_theme():
@@ -48,30 +49,136 @@ def apply_theme():
 
 apply_theme()
 
-# ========== NAVIGATION ==========
-page = st.sidebar.radio(
-    "📍 Navigate",
-    ["🏠 Home", "🖼 Image Processing", "✂ Background Removal", "👥 Team", "📄 Report"],
-)
+# ================== TRANSLATION DICT ==================
+T = {
+    "English": {
+        "nav": ["🏠 Home", "🖼 Image Processing", "✂ Background Removal", "👥 Team", "📄 Report"],
+        "home_title": "✨ Matrix Image Processing & Computer Vision ✨",
+        "home_subtitle": "Transform images, remove background, generate PDF — All in one place 🎓",
+        "home_hint": "Choose theme on the sidebar 🎨 and start exploring features!",
+        "home_box1": "🛠 Transform Images with matrix math",
+        "home_box2": "🎨 Edit & Filter using convolution",
+        "home_box3": "📄 Download PDF Report automatically",
+        "home_foot": "Use the sidebar to navigate ➡",
 
-# ========== SESSION STATE INIT ==========
+        "img_header": "🖼 Image Processing Tools",
+        "img_upload": "Upload Image",
+        "img_tool": "Select Tool",
+        "img_tool_opts": ["Matrix Transform", "Convolution Filter"],
+        "transform_label": "Transformation",
+        "transform_opts": ["Translation", "Scaling", "Rotation", "Shearing", "Reflection"],
+        "translation_tx": "Move X",
+        "translation_ty": "Move Y",
+        "scaling_sx": "Scale X",
+        "scaling_sy": "Scale Y",
+        "rotation_ang": "Angle",
+        "shear_x": "Shear X",
+        "shear_y": "Shear Y",
+        "reflection_axis": "Axis",
+        "reflection_opts": ["x", "y"],
+        "btn_apply": "Apply",
+        "conv_filter": "Select Filter",
+        "conv_opts": ["Blur", "Sharpen"],
+
+        "bg_header": "✂ Background Removal",
+        "bg_upload": "Upload image",
+        "bg_x": "X",
+        "bg_y": "Y",
+        "bg_w": "Width",
+        "bg_h": "Height",
+        "bg_btn": "Remove Background",
+
+        "team_title": "👥 Team",
+        "team_subtitle": "Meet our awesome team members!",
+        "team_sid": "Student ID:",
+        "team_role": "Role:",
+        "team_group": "Group:",
+        "team_contribution": "Contribution:",
+
+        "report_header": "📄 Generate PDF Report",
+        "report_title": "Report Title",
+        "report_default": "Matrix Image Processing Report",
+        "report_btn": "Create PDF",
+        "report_error": "❗ Process an image before generating report",
+        "report_download": "Download Report",
+        "report_success": "🎉 PDF Created Successfully!",
+
+        "orig_caption": "Original Image",
+        "transformed_caption": "Transformed Result 🎉",
+        "filtered_caption": "Filtered Result 🎉",
+        "bg_removed_caption": "Background Removed 🎉",
+    },
+    "Indonesia": {
+        "nav": ["🏠 Beranda", "🖼 Pemrosesan Gambar", "✂ Hapus Background", "👥 Tim", "📄 Laporan"],
+        "home_title": "✨ Pemrosesan Citra Matriks & Computer Vision ✨",
+        "home_subtitle": "Transformasi gambar, hapus background, buat PDF — Semua dalam satu aplikasi 🎓",
+        "home_hint": "Pilih tema di sidebar 🎨 dan mulai eksplor fitur!",
+        "home_box1": "🛠 Transformasi Gambar dengan matriks",
+        "home_box2": "🎨 Edit & Filter dengan konvolusi",
+        "home_box3": "📄 Unduh Laporan PDF secara otomatis",
+        "home_foot": "Gunakan sidebar untuk navigasi ➡",
+
+        "img_header": "🖼 Tools Pemrosesan Gambar",
+        "img_upload": "Upload Gambar",
+        "img_tool": "Pilih Tool",
+        "img_tool_opts": ["Transformasi Matriks", "Filter Konvolusi"],
+        "transform_label": "Jenis Transformasi",
+        "transform_opts": ["Translasi", "Skala", "Rotasi", "Shearing", "Refleksi"],
+        "translation_tx": "Geser X",
+        "translation_ty": "Geser Y",
+        "scaling_sx": "Skala X",
+        "scaling_sy": "Skala Y",
+        "rotation_ang": "Sudut",
+        "shear_x": "Shear X",
+        "shear_y": "Shear Y",
+        "reflection_axis": "Sumbu",
+        "reflection_opts": ["x", "y"],
+        "btn_apply": "Terapkan",
+        "conv_filter": "Pilih Filter",
+        "conv_opts": ["Blur", "Tajamkan"],
+
+        "bg_header": "✂ Hapus Background",
+        "bg_upload": "Upload gambar",
+        "bg_x": "X",
+        "bg_y": "Y",
+        "bg_w": "Lebar",
+        "bg_h": "Tinggi",
+        "bg_btn": "Hapus Background",
+
+        "team_title": "👥 Tim",
+        "team_subtitle": "Kenalan dengan anggota tim kami!",
+        "team_sid": "NIM:",
+        "team_role": "Peran:",
+        "team_group": "Kelompok:",
+        "team_contribution": "Kontribusi:",
+
+        "report_header": "📄 Buat Laporan PDF",
+        "report_title": "Judul Laporan",
+        "report_default": "Laporan Pemrosesan Citra Matriks",
+        "report_btn": "Buat PDF",
+        "report_error": "❗ Proses gambar terlebih dahulu sebelum membuat laporan",
+        "report_download": "Unduh Laporan",
+        "report_success": "🎉 PDF Berhasil Dibuat!",
+
+        "orig_caption": "Gambar Asli",
+        "transformed_caption": "Hasil Transformasi 🎉",
+        "filtered_caption": "Hasil Filter 🎉",
+        "bg_removed_caption": "Background Terhapus 🎉",
+    },
+}
+
+t = T[lang]
+
+# ================== NAVIGATION ==================
+page = st.sidebar.radio("📍 Navigate", t["nav"])
+
+# ================== SESSION STATE ==================
 if "original" not in st.session_state:
     st.session_state.original = None
 if "processed" not in st.session_state:
     st.session_state.processed = None
-if "team" not in st.session_state:
-    st.session_state.team = ["Member 1", "Member 2"]
 
-# ========== TRANSLATION DICT ==========
-t = {
-    "team_title": "👥 Team",
-    "team_subtitle": "Meet our awesome team members!",
-    "team_sid": "Student ID:",
-    "team_role": "Role:",
-    "team_group": "Group:",
-    "team_contribution": "Contribution:"
-}
-
+# ================== UTIL: SAFE IMAGE ==================
 def safe_display_square_image(img_path):
     try:
         img = Image.open(img_path)
@@ -82,14 +189,12 @@ def safe_display_square_image(img_path):
     except Exception as e:
         st.write(f"Error loading image: {e}")
 
-# ========== MATRIX FUNCTIONS ==========
+# ================== MATRIX FUNCTIONS ==================
 def translation(tx, ty):
     return np.float32([[1, 0, tx], [0, 1, ty]])
 
-
 def scaling(sx, sy):
     return np.float32([[sx, 0, 0], [0, sy, 0]])
-
 
 def rotation(angle, cx, cy):
     r = radians(angle)
@@ -100,17 +205,14 @@ def rotation(angle, cx, cy):
         ]
     )
 
-
 def shearing(shx, shy):
     return np.float32([[1, shx, 0], [shy, 1, 0]])
-
 
 def reflection(axis):
     if axis == "x":
         return np.float32([[1, 0, 0], [0, -1, 0]])
     else:
         return np.float32([[-1, 0, 0], [0, 1, 0]])
-
 
 def apply_transform(img, M):
     h, w = img.shape[:2]
@@ -126,14 +228,14 @@ def apply_transform(img, M):
     M2 = shift @ M
     return cv2.warpAffine(img, M2, (new_w, new_h))
 
-# ========== HOME ==========
-if page == "🏠 Home":
+# ================== HOME ==================
+if page == t["nav"][0]:
     st.markdown(
-        """
+        f"""
         <div style='text-align:center;padding:20px'>
-        <h1>✨ Matrix Image Processing & Computer Vision ✨</h1>
-        <h3>Transform images, remove background, generate PDF — All in one place 🎓</h3>
-        <p>Choose theme on the sidebar 🎨 and start exploring features!</p>
+        <h1>{t["home_title"]}</h1>
+        <h3>{t["home_subtitle"]}</h3>
+        <p>{t["home_hint"]}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -141,97 +243,121 @@ if page == "🏠 Home":
 
     st.markdown("---")
     col1, col2, col3 = st.columns(3)
-    col1.info("🛠 **Transform Images** with matrix math")
-    col2.info("🎨 **Edit & Filter** using convolution")
-    col3.info("📄 **Download PDF Report** automatically")
+    col1.info(t["home_box1"])
+    col2.info(t["home_box2"])
+    col3.info(t["home_box3"])
 
     st.markdown("---")
-    st.success("Use the sidebar to navigate ➡")
+    st.success(t["home_foot"])
 
-# ========== IMAGE PROCESSING ==========
-elif page == "🖼 Image Processing":
-    st.header("🖼 Image Processing Tools")
-    file = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg"])
+# ================== IMAGE PROCESSING ==================
+elif page == t["nav"][1]:
+    st.header(t["img_header"])
+    file = st.file_uploader(t["img_upload"], type=["png", "jpg", "jpeg"])
 
     if file is not None:
         img = Image.open(file).convert("RGB")
         img_np = np.array(img)
         st.session_state.original = img
-        st.image(img, caption="Original Image")
+        st.image(img, caption=t["orig_caption"])
 
-        action = st.selectbox("Select Tool", ["Matrix Transform", "Convolution Filter"])
+        action = st.selectbox(t["img_tool"], t["img_tool_opts"])
 
-        if action == "Matrix Transform":
-            method = st.selectbox(
-                "Transformation",
-                ["Translation", "Scaling", "Rotation", "Shearing", "Reflection"],
-            )
+        # ---- Matrix Transform ----
+        if action == t["img_tool_opts"][0]:
+            method = st.selectbox(t["transform_label"], t["transform_opts"])
 
-            if method == "Translation":
-                tx = st.slider("Move X", -200, 200, 50)
-                ty = st.slider("Move Y", -200, 200, 30)
+            # Mapping label internasional supaya fungsi tetap benar
+            if lang == "English":
+                trans_translation = "Translation"
+                trans_scaling = "Scaling"
+                trans_rotation = "Rotation"
+                trans_shearing = "Shearing"
+                trans_reflection = "Reflection"
+            else:
+                trans_translation = "Translasi"
+                trans_scaling = "Skala"
+                trans_rotation = "Rotasi"
+                trans_shearing = "Shearing"
+                trans_reflection = "Refleksi"
+
+            if method == trans_translation:
+                tx = st.slider(t["translation_tx"], -200, 200, 50)
+                ty = st.slider(t["translation_ty"], -200, 200, 30)
                 M = translation(tx, ty)
-            elif method == "Scaling":
-                sx = st.slider("Scale X", 0.1, 3.0, 1.2)
-                sy = st.slider("Scale Y", 0.1, 3.0, 1.2)
+            elif method == trans_scaling:
+                sx = st.slider(t["scaling_sx"], 0.1, 3.0, 1.2)
+                sy = st.slider(t["scaling_sy"], 0.1, 3.0, 1.2)
                 M = scaling(sx, sy)
-            elif method == "Rotation":
-                ang = st.slider("Angle", -180, 180, 45)
+            elif method == trans_rotation:
+                ang = st.slider(t["rotation_ang"], -180, 180, 45)
                 h, w = img_np.shape[:2]
                 M = rotation(ang, w / 2, h / 2)
-            elif method == "Shearing":
-                shx = st.slider("Shear X", -1.0, 1.0, 0.3)
-                shy = st.slider("Shear Y", -1.0, 1.0, 0.0)
+            elif method == trans_shearing:
+                shx = st.slider(t["shear_x"], -1.0, 1.0, 0.3)
+                shy = st.slider(t["shear_y"], -1.0, 1.0, 0.0)
                 M = shearing(shx, shy)
             else:
-                axis = st.selectbox("Axis", ["x", "y"])
+                axis = st.selectbox(t["reflection_axis"], t["reflection_opts"])
                 M = reflection(axis)
 
-            if st.button("Apply"):
+            if st.button(t["btn_apply"]):
                 out = apply_transform(img_np, M)
                 st.session_state.processed = Image.fromarray(out)
-                st.image(out, caption="Transformed Result 🎉")
+                st.image(out, caption=t["transformed_caption"])
 
+        # ---- Convolution Filter ----
         else:
-            filt = st.selectbox("Select Filter", ["Blur", "Sharpen"])
-            if filt == "Blur":
+            filt = st.selectbox(t["conv_filter"], t["conv_opts"])
+
+            # label blur di dua bahasa boleh tetap "Blur"
+            if lang == "English":
+                blur_label = "Blur"
+                sharpen_label = "Sharpen"
+            else:
+                blur_label = "Blur"
+                sharpen_label = "Tajamkan"
+
+            if filt == blur_label:
                 kernel = np.ones((3, 3), dtype=np.float32) / 9.0
             else:
                 kernel = np.array(
                     [[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32
                 )
-            if st.button("Apply Filter"):
+
+            if st.button(t["btn_apply"]):
                 out = cv2.filter2D(img_np, -1, kernel)
                 st.session_state.processed = Image.fromarray(out)
-                st.image(out, caption="Filtered Result 🎉")
+                st.image(out, caption=t["filtered_caption"])
 
-# ========== BACKGROUND REMOVAL ==========
-elif page == "✂ Background Removal":
-    st.header("✂ Background Removal")
-    file = st.file_uploader("Upload image", type=["jpg", "png", "jpeg"], key="bg")
+# ================== BACKGROUND REMOVAL ==================
+elif page == t["nav"][2]:
+    st.header(t["bg_header"])
+    file = st.file_uploader(t["bg_upload"], type=["jpg", "png", "jpeg"], key="bg")
 
     if file is not None:
         img = np.array(Image.open(file).convert("RGB"))
         h, w = img.shape[:2]
-        x = st.slider("X", 0, w, int(w * 0.1))
-        y = st.slider("Y", 0, h, int(h * 0.1))
-        rw = st.slider("Width", 10, w, int(w * 0.8))
-        rh = st.slider("Height", 10, h, int(h * 0.8))
+        x = st.slider(t["bg_x"], 0, w, int(w * 0.1))
+        y = st.slider(t["bg_y"], 0, h, int(h * 0.1))
+        rw = st.slider(t["bg_w"], 10, w, int(w * 0.8))
+        rh = st.slider(t["bg_h"], 10, h, int(h * 0.8))
 
-        if st.button("Remove Background"):
+        if st.button(t["bg_btn"]):
             mask = np.zeros((h, w), np.uint8)
             bgmodel = np.zeros((1, 65), np.float64)
             fgmodel = np.zeros((1, 65), np.float64)
+            # GrabCut dengan rectangle seperti contoh di dokumentasi OpenCV.[web:16][web:13]
             cv2.grabCut(img, mask, (x, y, rw, rh), bgmodel, fgmodel, 5, cv2.GC_INIT_WITH_RECT)
             mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype("uint8")
             fg = img * mask2[:, :, np.newaxis]
             st.session_state.processed = Image.fromarray(fg)
-            st.image(fg, caption="Background Removed 🎉")
+            st.image(fg, caption=t["bg_removed_caption"])
 
-elif page == "👥 Team":
+# ================== TEAM ==================
+elif page == t["nav"][3]:
     st.markdown(t["team_title"])
     st.write(t["team_subtitle"])
-
 
     members = [
         {"img": "images/Elizabeth.jpg", "name": "ELIZABETH KURNIAWAN", "sid": "04202400001", "role": "Leader", "Contribution": "Project Manager, Geometric Transformations Module"},
@@ -240,12 +366,12 @@ elif page == "👥 Team":
         {"img": "images/Putri.jpg", "name": "PUTRI LASRIDA MALAU", "sid": "04202400132", "role": "Member", "Contribution": "Histogram Module, Image Processing Functions"},
     ]
 
-    cols_row1 = st.columns(2, vertical_alignment="top")
+    cols_row1 = st.columns(2)
     for i in range(2):
         with cols_row1[i]:
-            with st.container(border=True):
-                m = members[i]
+            with st.container():  # tanpa border agar aman di semua versi.[web:1]
                 _, col_img, _ = st.columns([1, 1, 1])
+                m = members[i]
                 with col_img:
                     safe_display_square_image(m["img"])
                 st.markdown(f"{m['name']}")
@@ -254,12 +380,12 @@ elif page == "👥 Team":
                 st.markdown(f"{t['team_group']} 5")
                 st.markdown(f"{t['team_contribution']} {m['Contribution']}")
 
-    cols_row2 = st.columns(2, vertical_alignment="top")
+    cols_row2 = st.columns(2)
     for i in range(2, 4):
         with cols_row2[i - 2]:
-            with st.container(border=True):
-                m = members[i]
+            with st.container():
                 _, col_img, _ = st.columns([1, 1, 1])
+                m = members[i]
                 with col_img:
                     safe_display_square_image(m["img"])
                 st.markdown(f"{m['name']}")
@@ -268,14 +394,14 @@ elif page == "👥 Team":
                 st.markdown(f"{t['team_group']} 5")
                 st.markdown(f"{t['team_contribution']} {m['Contribution']}")
 
-# ========== REPORT ==========
-elif page == "📄 Report":
-    st.header("📄 Generate PDF Report")
-    title = st.text_input("Report Title", value="Matrix Image Processing Report")
+# ================== REPORT ==================
+elif page == t["nav"][4]:
+    st.header(t["report_header"])
+    title = st.text_input(t["report_title"], value=t["report_default"])
 
-    if st.button("Create PDF"):
+    if st.button(t["report_btn"]):
         if st.session_state.original is None or st.session_state.processed is None:
-            st.error("❗ Process an image before generating report")
+            st.error(t["report_error"])
         else:
             path = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf").name
             c = canvas.Canvas(path, pagesize=A4)
@@ -294,8 +420,7 @@ elif page == "📄 Report":
             c.save()
 
             with open(path, "rb") as f:
-                st.download_button("Download Report", f, file_name="report.pdf")
+                st.download_button(t["report_download"], f, file_name="report.pdf")
 
             os.remove(orig_path)
-            os.remove(proc_path)
-            st.success("🎉 PDF Created Successfully!")
+            st.success(t["report_success"])
