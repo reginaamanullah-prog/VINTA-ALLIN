@@ -1,5 +1,6 @@
-streamlit==1.29.0
-numpy==1.24.3
-opencv-python-headless==4.8.1.78
-Pillow==10.1.0
-reportlab==4.0.5
+# Streamlit Cloud optimized
+streamlit==1.32.0
+numpy==1.26.0
+opencv-python-headless==4.9.0.80
+Pillow==10.2.0
+reportlab==4.1.0
