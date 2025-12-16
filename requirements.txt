@@ -1,11 +1,5 @@
-# Core dependencies
 streamlit==1.29.0
 numpy==1.24.3
 opencv-python-headless==4.8.1.78
 Pillow==10.1.0
 reportlab==4.0.5
-
-# Optional dependencies for enhanced functionality
-matplotlib==3.7.2
-scipy==1.11.4
-scikit-image==0.21.0
