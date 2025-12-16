@@ -225,7 +225,10 @@ def apply_transform(img, M):
     min_y, max_y = int(new[:, 1].min()), int(new[:, 1].max())
     new_w, new_h = max_x - min_x, max_y - min_y
     shift = np.float32([[1, 0, -min_x], [0, 1, -min_y]])
-    M2 = shift @ M
+    shift_3x3 = np.vstack([shift, [0, 0, 1]])
+    M_3x3 = np.vstack([M, [0, 0, 1]])
+    combined = shift_3x3 @ M_3x3
+    M2 = combined[:2, :]
     return cv2.warpAffine(img, M2, (new_w, new_h))
 
 # ================== HOME ==================
