@@ -424,4 +424,3 @@ elif page == t["nav"][4]:
 
             os.remove(orig_path)
             st.success(t["report_success"])
-
